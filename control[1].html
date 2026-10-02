@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Win/Loss Control</title>
+<style>
+body{margin:0;background:#101217;color:#fff;font-family:Arial,sans-serif;display:grid;place-items:center;min-height:100vh}
+.card{width:min(420px,90vw);background:#191c22;border:1px solid #303540;border-radius:18px;padding:24px;box-sizing:border-box}
+h1{margin:0 0 18px;font-size:24px}
+.stat{display:flex;align-items:center;justify-content:space-between;margin:12px 0}
+.value{font-size:34px;font-weight:900;min-width:70px;text-align:center}
+button{border:0;border-radius:12px;padding:12px 18px;font-size:20px;font-weight:800;cursor:pointer}
+.win button{background:#d9a900;color:#111}.loss button{background:#e22;color:#fff}
+.reset{width:100%;margin-top:16px;background:#303540;color:#fff}
+.small{opacity:.65;font-size:13px;margin-top:16px;line-height:1.4}
+</style>
+</head>
+<body>
+<div class="card">
+<h1>Win / Loss Control</h1>
+<div class="stat win"><button onclick="change('wins',1)">+ WIN</button><div class="value" id="wins">12</div><button onclick="change('wins',-1)">−</button></div>
+<div class="stat loss"><button onclick="change('losses',1)">+ LOSS</button><div class="value" id="losses">5</div><button onclick="change('losses',-1)">−</button></div>
+<button class="reset" onclick="resetAll()">Reset</button>
+<div class="small">Keep this page open in a normal browser while the overlay page is loaded in OBS. Changes are sent instantly to the OBS Browser Source.</div>
+</div>
+<script>
+const bc = new BroadcastChannel('win-loss-overlay');
+let state={wins:12,losses:5};
+const key='wl_state_v1';
+try{state=JSON.parse(localStorage.getItem(key))||state}catch(e){}
+function render(){document.getElementById('wins').textContent=state.wins;document.getElementById('losses').textContent=state.losses;localStorage.setItem(key,JSON.stringify(state));bc.postMessage(state)}
+function change(k,d){state[k]=Math.max(0,(state[k]||0)+d);render()}
+function resetAll(){state={wins:0,losses:0};render()}
+render();
+</script>
+</body>
+</html>
